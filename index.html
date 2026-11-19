@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Superstore Sales Performance Dashboard</title>
+<style>
+:root{--bg:#F8FAFC;--card:#fff;--tx:#0F172A;--mu:#64748B;--bd:#E2E8F0;--ind:#6366F1;--ok:#10B981;--bad:#EF4444;--warn:#F59E0B;--grid:#E2E8F0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F172A;--card:#1E293B;--tx:#F8FAFC;--mu:#94A3B8;--bd:#334155;--grid:#334155}}
+:root[data-theme="dark"]{--bg:#0F172A;--card:#1E293B;--tx:#F8FAFC;--mu:#94A3B8;--bd:#334155;--grid:#334155}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 Inter,"SF Pro Text",system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+.w{max-width:1200px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:26px;margin:0;letter-spacing:-.3px}.sub{color:var(--mu);margin:4px 0 16px}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;border-bottom:1px solid var(--bd)}
+nav button{background:none;border:0;border-bottom:3px solid transparent;color:var(--mu);font:600 14px inherit;font-family:inherit;padding:10px 14px;cursor:pointer}
+nav button.on{color:var(--ind);border-color:var(--ind)}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
+.k{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;border-top:3px solid var(--ind)}
+.k small{color:var(--mu);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.k b{display:block;font-size:24px;margin-top:4px}
+.g{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:16px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;min-width:0}
+.c h3{margin:0 0 2px;font-size:15px}.c p{margin:0 0 10px;color:var(--mu);font-size:12.5px}
+svg{width:100%;height:auto;display:block}svg text{fill:var(--mu);font:11px Inter,system-ui,sans-serif}
+.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd);vertical-align:top}th{color:var(--mu);font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+td.n,th.n{text-align:right;white-space:nowrap}.neg{color:var(--bad);font-weight:600}.pos{color:var(--ok);font-weight:600}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;font-weight:700;color:#fff}.H{background:var(--bad)}.M{background:var(--warn)}.L{background:var(--ind)}
+.pane{display:none}.pane.on{display:block}ul{padding-left:18px;margin:6px 0}li{margin:4px 0}
+.note{background:var(--card);border:1px solid var(--bd);border-left:4px solid var(--warn);border-radius:8px;padding:12px 14px;margin-bottom:16px}
+.lg{display:flex;gap:14px;font-size:12px;color:var(--mu);margin-top:6px;flex-wrap:wrap}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
+footer{color:var(--mu);font-size:12px;margin-top:20px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.g{grid-template-columns:1fr}}
+</style></head><body><div class="w">
+<div style="color:var(--ind);font-weight:700;font-size:12px;letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Bath Research &amp; Analytics</div>
+<h1>Superstore Sales Performance Dashboard</h1>
+<div class="sub">Orders Jan 2023 – Dec 2026 · 10,194 line items · United States &amp; Canada · Currency assumed USD<br>Author: James Gon Bath</div>
+<nav id="nav"><button class="on" data-p="d">Dashboard</button><button data-p="i">Insights</button><button data-p="q">Data Quality</button><button data-p="r">Recommendations</button></nav>
+
+<section class="pane on" id="d">
+<div class="kpis" id="kpis"></div>
+<div class="g">
+<div class="c"><h3>Monthly sales &amp; profit trend</h3><p>Bars = sales, line = profit (48 months). Nov-Dec peaks are visible each year.</p><div id="c1"></div></div>
+<div class="c"><h3>Profit by sub-category</h3><p>Three sub-categories lose money: Tables, Bookcases, Supplies.</p><div id="c2"></div></div>
+<div class="c"><h3>Discount vs profit margin</h3><p>Margin turns negative once discount passes 20%. Dashed line = break-even.</p><div id="c3"></div></div>
+<div class="c"><h3>Profit mix: segment &amp; region</h3><p>Margin % by segment and region. Central lags at 7.9%.</p><div id="c4"></div></div>
+</div>
+<div class="g">
+<div class="c"><h3>Ship mode performance</h3><p>Average days to ship and margin. Faster modes do not cost margin.</p><div class="sc" id="t1"></div></div>
+<div class="c"><h3>Pareto: product profit concentration</h3><p>Top 20% of products produce 81.6% of positive profit.</p><div id="c5"></div></div>
+<div class="c"><h3>Top 5 products by profit</h3><p>Winners to protect.</p><div class="sc" id="t2"></div></div>
+<div class="c"><h3>Bottom 5 products by profit</h3><p>Biggest loss makers: review price and discount rules.</p><div class="sc" id="t3"></div></div>
+</div>
+<div class="c"><h3>States driving the most profit and loss</h3><p>Texas, Ohio, Pennsylvania, Illinois lose money despite large sales. Drill-through: filter the cleaned CSV by State and Sub-Category.</p><div class="sc" id="t4"></div></div>
+</section>
+
+<section class="pane" id="i"><div class="c sc"><h3>Key findings with evidence</h3><table><tr><th>#</th><th>Finding</th><th>Evidence</th><th>Implication</th></tr>
+<tr><td>1</td><td>Overall profitability is healthy but uneven</td><td>Sales $2,326,534.19; profit $292,295.64; margin 12.6%</td><td>Margin gains come from fixing a few leaks, not growth alone.</td></tr>
+<tr><td>2</td><td>Discounts above 20% destroy profit</td><td>0%: 29.6% margin; 1–20%: 11.9%; 21–40%: −15.3%; 41–60%: −40.8%; 61–80%: −122.6%. Only 13.9% of lines are above 20%, yet they lose $136,020.93</td><td>A 20% discount cap is the single biggest lever.</td></tr>
+<tr><td>3</td><td>Furniture revenue is not profit</td><td>Furniture 32.4% of sales but 6.8% of profit (2.6% margin). Technology 17.5%, Office Supplies 17.2%</td><td>Reprice or restrict Furniture discounts.</td></tr>
+<tr><td>4</td><td>Tables, Bookcases and Supplies lose money</td><td>Tables −$17,753.33 (−8.5%); Bookcases −$3,632.09; Supplies −$1,171.41. Tables have 54.6% of lines above 20% discount</td><td>Discounting, not demand, drives the loss.</td></tr>
+<tr><td>5</td><td>Central region and several states underperform</td><td>Central margin 7.9% with avg discount 24.1% (West 10.9%). Texas −$25,729.44, Ohio −$16,971.40, Pennsylvania −$15,560.07, Illinois −$12,607.99</td><td>Regional discount governance is needed.</td></tr>
+<tr><td>6</td><td>Discounts do not buy volume</td><td>Average quantity per line is 3.7–3.9 at every discount level</td><td>Deep discounts cost margin without lifting basket size.</td></tr>
+<tr><td>7</td><td>Fast shipping is not a profit problem</td><td>Margin: Same Day 12.5%, First Class 13.9%, Second 12.6%, Standard 12.2%. Avg ship days: 0.0 / 2.2 / 3.2 / 5.0</td><td>Expedited shipping is not hurting margin; price it as a premium option.</td></tr>
+<tr><td>8</td><td>Growth is real</td><td>Sales 2023 $494,040 → 2026 $745,567 (+50.9%); profit $51,684 → $95,926</td><td>Scale supports investment in fixes now.</td></tr>
+<tr><td>9</td><td>Home Office is the most profitable segment by margin</td><td>Home Office 14.0%, Corporate 13.2%, Consumer 11.7%. Consumer is largest by sales (50.3%)</td><td>Grow Corporate and Home Office accounts.</td></tr>
+<tr><td>10</td><td>Customer base is highly repeat</td><td>792 of 804 customers ordered more than once. First-time orders are 17.4% of sales</td><td>Retention is strong; acquisition share is the open question.</td></tr>
+<tr><td>11</td><td>Order basics</td><td>5,111 orders; average order value $455.20; 1.99 line items per order; 20.3% of orders lose money</td><td>One in five orders is loss-making: target these.</td></tr>
+<tr><td>12</td><td>Product portfolio</td><td>Stars: Copiers (37.2% margin), Accessories (25.1%). Dogs: Tables, Bookcases, Supplies. 20 products with 3+ lines are loss-making every time (e.g. Bevis conference tables, O'Sullivan bookcases)</td><td>Delist or reprice repeat loss makers.</td></tr>
+</table></div>
+<div class="c sc" style="margin-top:16px"><h3>Discount cap simulation</h3><p>Assumes list price constant and volume unchanged (supported by flat quantity across discount levels). Cost = Sales − Profit.</p><table><tr><th>Scenario</th><th class="n">Sales</th><th class="n">Profit</th><th class="n">Margin</th><th class="n">Profit change</th></tr>
+<tr><td>Actual</td><td class="n">$2,326,534.19</td><td class="n">$292,295.64</td><td class="n">12.6%</td><td class="n">–</td></tr>
+<tr><td>Cap at 40%</td><td class="n">$2,417,134.98</td><td class="n">$382,896.43</td><td class="n">15.8%</td><td class="n pos">+$90,600.79</td></tr>
+<tr><td>Cap at 20%</td><td class="n">$2,546,748.65</td><td class="n">$512,510.10</td><td class="n">20.1%</td><td class="n pos">+$220,214.46</td></tr></table></div></section>
+
+<section class="pane" id="q"><div class="note"><b>Important:</b> the uploaded file has 10,194 rows spanning Jan 2023 – Dec 2026, not the 319 rows (Jan–Apr 2023) described in the instruction document. This dashboard uses the full file. The last row (Row ID 10,194) is complete, with no missing values, so it was kept.</div>
+<div class="c sc"><h3>Data quality issue register</h3><table><tr><th>#</th><th>Issue</th><th>Severity</th><th>Example</th><th>Fix applied</th></tr>
+<tr><td>1</td><td>Row count and period differ from the brief</td><td><span class="tag H">High</span></td><td>10,194 rows vs 319; 2023–2026 vs Jan–Apr 2023</td><td>Analysed the full file; flagged for confirmation</td></tr>
+<tr><td>2</td><td>US ZIP leading zeros lost</td><td><span class="tag H">High</span></td><td>438 US rows have 4-digit ZIPs (NJ, MA, CT, NH, ME, RI)</td><td>Stored as text, zero-padded to 5 digits for US only</td></tr>
+<tr><td>3</td><td>Mixed postal code types</td><td><span class="tag M">Med</span></td><td>9,983 numeric vs 211 text (Canadian e.g. M7A)</td><td>All stored as text; Canadian codes preserved</td></tr>
+<tr><td>4</td><td>Floating-point artifacts</td><td><span class="tag M">Med</span></td><td>3,373 Sales values with more than 2 decimals (e.g. 281.372)</td><td>Rounded Sales and Profit to 2 decimals</td></tr>
+<tr><td>5</td><td>Duplicate line items</td><td><span class="tag M">Med</span></td><td>Row 391 = 392 (US-2023-150119); Row 1699 = 1700 (CA-2023-153623)</td><td>Flagged, not deleted (could be legitimate repeat lines)</td></tr>
+<tr><td>6</td><td>Non-ASCII customer names</td><td><span class="tag L">Low</span></td><td>Französisch, Häberlin, Pölking, Bühler</td><td>Read correctly; Unicode normalised, exported as UTF-8</td></tr>
+<tr><td>7</td><td>Loss-making lines</td><td><span class="tag M">Med</span></td><td>1,901 negative-profit rows (18.6%); min −$6,599.98</td><td>Flagged with Is Loss; kept</td></tr>
+<tr><td>8</td><td>Zero-profit lines</td><td><span class="tag L">Low</span></td><td>65 rows</td><td>Kept</td></tr>
+<tr><td>9</td><td>Date, quantity and discount validity</td><td><span class="tag L">Low</span></td><td>0 rows with Ship &lt; Order; 0 with Qty ≤ 0; 0 with Discount outside 0–1</td><td>No action needed</td></tr>
+<tr><td>10</td><td>Missing values</td><td><span class="tag L">Low</span></td><td>0 nulls in all 21 columns</td><td>None</td></tr>
+<tr><td>11</td><td>Currency not stated</td><td><span class="tag M">Med</span></td><td>No currency field; Canada rows may not be USD</td><td>Assumed USD for all rows</td></tr>
+<tr><td>12</td><td>"Repeat vs one-time" is ambiguous</td><td><span class="tag L">Low</span></td><td>99.8% of sales come from customers with 2+ orders</td><td>Also reported first-order vs later-order share (17.4% / 82.6%)</td></tr>
+</table></div></section>
+
+<section class="pane" id="r"><div class="c sc"><h3>Prioritised recommendations</h3><table><tr><th>Priority</th><th>Action</th><th>Expected impact</th></tr>
+<tr><td>1</td><td>Cap discounts at 20%, with manager approval above it</td><td>Up to +$220,214.46 profit (margin 12.6% → 20.1%); at a 40% cap, +$90,600.79</td></tr>
+<tr><td>2</td><td>Reprice or restrict discounts on Tables, Bookcases and Machines</td><td>Removes about $71,640 of losses on discounted lines (Tables −$30,790, Machines −$29,555, Bookcases −$11,295)</td></tr>
+<tr><td>3</td><td>Review Central region and TX, OH, PA, IL pricing and discount approval</td><td>These four states lost $70,869; other regions earn 11.9–15.0% margin</td></tr>
+<tr><td>4</td><td>Delist or reprice the 20 products that lose money on every sale</td><td>Stops repeat leakage on lines such as Bevis conference tables and O'Sullivan bookcases</td></tr>
+<tr><td>5</td><td>Protect and promote stars: Copiers, Accessories, Paper, Labels</td><td>These have 25–44% margins and support the 81.6% profit concentration in top products</td></tr></table>
+<h3 style="margin-top:18px">Caveats</h3><ul><li>The cap simulation holds volume constant; actual results depend on customer response.</li><li>Currency is assumed to be USD; Canadian rows (200 lines, about 1% of sales) may differ.</li><li>The file does not match the described 319-row, Jan–Apr 2023 scope; confirm the intended dataset.</li><li>Two duplicate-looking line items were kept; impact is under $400 of sales.</li></ul></div></section>
+<footer><b>Bath Research &amp; Analytics</b> · Author: James Gon Bath<br>Source: sample_-_superstore.xls, sheet Orders. Margin = Profit ÷ Sales. Orders counted by distinct Order ID.</footer></div>
+<script>
+const D={"kpi": {"S": 2326534.19, "P": 292295.64, "M": 12.6, "O": 5111, "AOV": 455.2, "L": 20.3}, "month": [["2023-01", 14518.06, 2539.37, 33], ["2023-02", 4519.92, 862.3, 28], ["2023-03", 56933.94, 693.41, 72], ["2023-04", 28295.35, 3488.82, 66], ["2023-05", 26319.75, 3196.42, 72], ["2023-06", 34669.48, 4999.78, 67], ["2023-07", 33946.37, -841.49, 65], ["2023-08", 28918.34, 5765.19, 75], ["2023-09", 82670.4, 8593.58, 134], ["2023-10", 32413.32, 3469.12, 81], ["2023-11", 78826.97, 9362.94, 152], ["2023-12", 72008.32, 9554.64, 150], ["2024-01", 18461.92, -3189.77, 31], ["2024-02", 11951.4, 2813.83, 36], ["2024-03", 39978.64, 9930.56, 81], ["2024-04", 34195.24, 4187.52, 72], ["2024-05", 30246.98, 4677.08, 75], ["2024-06", 24797.3, 3335.53, 68], ["2024-07", 28765.31, 3288.65, 66], ["2024-08", 37056.98, 5371.62, 69], ["2024-09", 64627.0, 8219.99, 142], ["2024-10", 31407.11, 2817.94, 88], ["2024-11", 75972.49, 12474.74, 158], ["2024-12", 75532.54, 8092.95, 167], ["2025-01", 18830.36, 2916.01, 50], ["2025-02", 22978.82, 5004.57, 45], ["2025-03", 53031.03, 3707.86, 88], ["2025-04", 38829.14, 2991.69, 90], ["2025-05", 57042.86, 8676.62, 109], ["2025-06", 40937.13, 4926.27, 100], ["2025-07", 40300.52, 4559.81, 97], ["2025-08", 31716.78, 2317.45, 91], ["2025-09", 73521.71, 9370.03, 195], ["2025-10", 59831.05, 16256.9, 107], ["2025-11", 79412.03, 4011.35, 183], ["2025-12", 97502.28, 17926.22, 185], ["2026-01", 44259.21, 7231.63, 71], ["2026-02", 20301.12, 1613.87, 53], ["2026-03", 60728.47, 15013.05, 121], ["2026-04", 36779.02, 957.49, 117], ["2026-05", 45155.45, 6299.81, 121], ["2026-06", 53056.05, 8246.59, 134], ["2026-07", 45989.5, 7006.46, 112], ["2026-08", 64129.72, 9488.15, 114], ["2026-09", 88064.53, 11050.71, 231], ["2026-10", 83474.79, 10670.55, 151], ["2026-11", 118454.48, 9692.08, 262], ["2026-12", 85175.01, 8655.75, 236]], "sub": [["Tables", 208020.0, -17753.0, -8.5], ["Bookcases", 115361.0, -3632.0, -3.1], ["Supplies", 46725.0, -1171.0, -2.5], ["Fasteners", 8532.0, 2429.0, 28.5], ["Machines", 189925.0, 3462.0, 1.8], ["Labels", 12695.0, 5573.0, 43.9], ["Art", 27659.0, 6653.0, 24.1], ["Envelopes", 16528.0, 6988.0, 42.3], ["Furnishings", 95598.0, 13892.0, 14.5], ["Appliances", 108213.0, 18329.0, 16.9], ["Storage", 224645.0, 21285.0, 9.5], ["Chairs", 335768.0, 27223.0, 8.1], ["Binders", 207355.0, 31426.0, 15.2], ["Paper", 79541.0, 34511.0, 43.4], ["Accessories", 167380.0, 41937.0, 25.1], ["Phones", 331843.0, 45051.0, 13.6], ["Copiers", 150745.0, 56094.0, 37.2]], "seg": [["Consumer", 1170660, 136371, 11.6], ["Corporate", 715806, 94249, 13.2], ["Home Office", 440068, 61676, 14.0]], "reg": [["Central", 503171, 39865, 7.9], ["East", 691828, 94883, 13.7], ["South", 391722, 46749, 11.9], ["West", 739814, 110798, 15.0]], "cat": [["Furniture", 754748, 19730, 2.6], ["Office Supplies", 731893, 126022, 17.2], ["Technology", 839893, 146544, 17.4]], "ship": [["First Class", 351751, 49012, 13.9], ["Same Day", 129272, 16161, 12.5], ["Second Class", 466671, 58962, 12.6], ["Standard Class", 1378841, 168161, 12.2]], "shipdays": {"First Class": 2.18, "Same Day": 0.04, "Second Class": 3.24, "Standard Class": 5.0}, "disc": [[0, 29.6, 4925], [10, 16.6, 96], [15, 5.1, 52], [20, 11.8, 3706], [30, -10.1, 230], [32, -16.5, 27], [40, -19.8, 207], [45, -45.5, 11], [50, -34.8, 66], [60, -86.7, 149], [70, -98.8, 424], [80, -180.0, 301]], "stateP": [["Texas", 170188, -25729], ["Ohio", 78258, -16971], ["Pennsylvania", 116512, -15560], ["Illinois", 80166, -12608], ["North Carolina", 55603, -7491], ["Colorado", 32108, -6528], ["Indiana", 53555, 18383], ["Virginia", 70637, 18598], ["Michigan", 76270, 24463], ["Washington", 138641, 33403], ["New York", 310876, 74038], ["California", 457688, 76381]], "top": [["Canon imageCLASS 2200 Advanced Cop", 61599.83, 25199.94], ["Fellowes PB500 Electric Punch Plas", 27453.38, 7753.04], ["Hewlett Packard LaserJet 3310 Copi", 18839.68, 6983.89], ["Canon PC1060 Personal Laser Copier", 11619.83, 4570.94], ["HP Designjet T520 Inkjet Large For", 18374.89, 4094.98]], "bot": [["Cubify CubeX 3D Printer Double Hea", 11099.96, -8879.97], ["Lexmark MX611dhe Monochrome Laser ", 16829.9, -4589.97], ["Cubify CubeX 3D Printer Triple Hea", 7999.98, -3839.99], ["Chromcraft Bull-Nose Wood Oval Con", 9917.64, -2876.11], ["Bush Advantage Collection Racetrac", 9544.72, -1934.4]], "par": [6.8, 50.4, 65.6, 75.3, 81.6, 86.0, 89.2, 91.6, 93.6, 95.1, 96.4, 97.4, 98.3, 98.9, 99.4, 99.8, 100.0, 100.0, 100.0, 100.0, 100.0], "band": [["0%", 1105324, 326718], ["1-20%", 856450, 101599], ["21-40%", 235465, -35991], ["41-60%", 71509, -29164], ["61-80%", 57785, -70866]]};
+const $=id=>document.getElementById(id),f0=n=>n.toLocaleString('en-US',{maximumFractionDigits:0}),f2=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),m=n=>(n<0?'-$':'$')+f2(Math.abs(n)),cs=n=>(n<0?'neg':'pos'),IND='#6366F1',OK='#10B981',BAD='#EF4444',WARN='#F59E0B';
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav button,.pane').forEach(e=>e.classList.remove('on'));b.classList.add('on');$(b.dataset.p).classList.add('on')});
+const k=D.kpi;$('kpis').innerHTML=[['Total Sales','$'+f0(k.S)],['Total Profit','$'+f0(k.P)],['Profit Margin',k.M+'%'],['Total Orders',f0(k.O)],['Avg Order Value',m(k.AOV)],['Loss Order %',k.L+'%']].map(a=>`<div class="k"><small>${a[0]}</small><b>${a[1]}</b></div>`).join('');
+const sv=(w,h,b)=>`<svg viewBox="0 0 ${w} ${h}">${b}</svg>`;
+// c1 monthly
+(()=>{const W=560,H=260,L=44,B=28,T=10,n=D.month.length,mx=Math.max(...D.month.map(r=>r[1])),bw=(W-L-8)/n;let s='';
+for(let i=0;i<=4;i++){const y=T+(H-T-B)*(1-i/4);s+=`<line x1="${L}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--grid)"/><text x="${L-6}" y="${y+4}" text-anchor="end">$${f0(mx*i/4/1000)}k</text>`}
+D.month.forEach((r,i)=>{const h=(H-T-B)*r[1]/mx;s+=`<rect x="${L+i*bw+1}" y="${H-B-h}" width="${bw-2}" height="${h}" fill="${IND}" opacity=".35"><title>${r[0]}: sales ${m(r[1])}, profit ${m(r[2])}, ${r[3]} orders</title></rect>`;if(i%6==0)s+=`<text x="${L+i*bw}" y="${H-10}">${r[0]}</text>`});
+s+=`<polyline fill="none" stroke="${OK}" stroke-width="2.2" points="${D.month.map((r,i)=>`${L+i*bw+bw/2},${H-B-(H-T-B)*Math.max(r[2],0)/mx}`).join(' ')}"/>`;
+$('c1').innerHTML=sv(W,H,s)+`<div class="lg"><span><i style="background:${IND};opacity:.5"></i>Sales</span><span><i style="background:${OK}"></i>Profit</span></div>`})();
+// c2 subcat
+(()=>{const W=560,rh=22,H=D.sub.length*rh+20,L=100,mid=L+(W-L-60)*0.2,mn=Math.min(...D.sub.map(r=>r[2])),mx=Math.max(...D.sub.map(r=>r[2])),sc=(W-L-60)/(mx-mn),z=L+(-mn)*sc;let s=`<line x1="${z}" x2="${z}" y1="0" y2="${H}" stroke="var(--mu)"/>`;
+D.sub.forEach((r,i)=>{const y=i*rh+4,w=Math.abs(r[2])*sc,x=r[2]<0?z-w:z;s+=`<text x="${L-6}" y="${y+14}" text-anchor="end">${r[0]}</text><rect x="${x}" y="${y}" width="${w}" height="16" rx="3" fill="${r[2]<0?BAD:OK}"><title>${r[0]}: profit ${m(r[2])}, margin ${r[3]}%</title></rect><text x="${r[2]<0?x-4:x+w+4}" y="${y+13}" text-anchor="${r[2]<0?'end':'start'}">${m(r[2]).replace('.00','')}</text>`});
+$('c2').innerHTML=sv(W,H,s)})();
+// c3 discount
+(()=>{const W=560,H=260,L=44,B=30,T=10,xs=r=>L+(W-L-14)*r[0]/80,ys=v=>T+(H-T-B)*(1-(v+190)/(190+40));let s='';
+[40,0,-50,-100,-150].forEach(v=>s+=`<line x1="${L}" x2="${W}" y1="${ys(v)}" y2="${ys(v)}" stroke="${v==0?WARN:'var(--grid)'}" ${v==0?'stroke-dasharray="5 4" stroke-width="2"':''}/><text x="${L-6}" y="${ys(v)+4}" text-anchor="end">${v}%</text>`);
+[0,20,40,60,80].forEach(v=>s+=`<text x="${xs([v])}" y="${H-10}" text-anchor="middle">${v}%</text>`);
+D.disc.forEach(r=>{const x=xs(r),rad=Math.max(5,Math.min(18,Math.sqrt(r[2])/3.2));s+=`<circle cx="${x}" cy="${ys(r[1])}" r="${rad}" fill="${r[1]<0?BAD:OK}" opacity=".75"><title>Discount ${r[0]}%: margin ${r[1]}%, ${f0(r[2])} lines</title></circle>`});
+s+=`<text x="${W-14}" y="${ys(0)-6}" text-anchor="end" style="fill:${WARN};font-weight:700">Break-even</text>`;
+$('c3').innerHTML=sv(W,H,s)+`<div class="lg"><span>Bubble size = number of lines</span><span>X = discount level, Y = margin %</span></div>`})();
+// c4 bars margin by seg & region
+(()=>{const rows=[...D.seg.map(r=>['Segment: '+r[0],r[3]]),...D.reg.map(r=>['Region: '+r[0],r[3]])],W=560,rh=30,H=rows.length*rh+10,L=130,sc=(W-L-50)/16;let s='';
+rows.forEach((r,i)=>{const y=i*rh+4;s+=`<text x="${L-6}" y="${y+16}" text-anchor="end">${r[0]}</text><rect x="${L}" y="${y}" width="${r[1]*sc}" height="22" rx="3" fill="${r[1]<10?WARN:IND}"/><text x="${L+r[1]*sc+5}" y="${y+16}">${r[1]}%</text>`});
+$('c4').innerHTML=sv(W,H,s)+`<div class="lg"><span><i style="background:${WARN}"></i>Below 10% margin</span></div>`})();
+// tables
+const tb=(h,rows)=>`<table><tr>${h.map((x,i)=>`<th class="${i?'n':''}">${x}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map((c,i)=>`<td class="${i?'n':''}">${c}</td>`).join('')}</tr>`).join('')}</table>`;
+$('t1').innerHTML=tb(['Ship mode','Avg days','Sales','Profit','Margin'],D.ship.map(r=>[r[0],D.shipdays[r[0]].toFixed(1),'$'+f0(r[1]),'$'+f0(r[2]),r[3]+'%']));
+const pt=a=>tb(['Product','Sales','Profit'],a.map(r=>[r[0],m(r[1]),`<span class="${cs(r[2])}">${m(r[2])}</span>`]));$('t2').innerHTML=pt(D.top);$('t3').innerHTML=pt(D.bot);
+$('t4').innerHTML=tb(['State','Sales','Profit','Margin'],D.stateP.slice().reverse().map(r=>[r[0],'$'+f0(r[1]),`<span class="${cs(r[2])}">${m(r[2]).replace('.00','')}</span>`,(r[2]/r[1]*100).toFixed(1)+'%']));
+// pareto
+(()=>{const W=560,H=240,L=40,B=28,T=10,p=D.par,xs=i=>L+(W-L-14)*i/20,ys=v=>T+(H-T-B)*(1-v/100);let s='';
+[0,25,50,80,100].forEach(v=>s+=`<line x1="${L}" x2="${W}" y1="${ys(v)}" y2="${ys(v)}" stroke="${v==80?WARN:'var(--grid)'}" ${v==80?'stroke-dasharray="5 4"':''}/><text x="${L-6}" y="${ys(v)+4}" text-anchor="end">${v}%</text>`);
+[0,20,40,60,80,100].forEach((v,i)=>s+=`<text x="${xs(i*4)}" y="${H-10}" text-anchor="middle">${v}%</text>`);
+s+=`<polyline fill="none" stroke="${IND}" stroke-width="2.5" points="${p.map((v,i)=>xs(i)+','+ys(v)).join(' ')}"/><circle cx="${xs(4)}" cy="${ys(p[4])}" r="5" fill="${BAD}"/><text x="${xs(4)+10}" y="${ys(p[4])+16}" style="fill:var(--tx);font-weight:700">Top 20% → ${p[4]}%</text>`;
+$('c5').innerHTML=sv(W,H,s)+`<div class="lg"><span>X = share of products (ranked by profit), Y = cumulative share of positive profit</span></div>`})();
+</script></body></html>
